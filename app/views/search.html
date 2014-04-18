@@ -1,0 +1,70 @@
+<!-- <ul rn-carousel rn-carousel-buffered rn-carousel-watch rn-carousel-indicator rn-carousel-index="currentStreamIndex" class="repo ng-scope rn-carousel-slides rn-carousel-noanimate disable-select" style="-webkit-transform: translate(0px, 0);"> -->
+	<div class="searchheader">
+		<div ng-click="$spMenu.toggle()" class="page repo-name ng-binding search-box">
+			<i class="icon-search icon-x"></i>
+			<input type="text" ng-model="searchText" class="search-query" placeholder="Search securities" ng-keyup="searchKey($event)">		
+		</div>
+		<div class="options-nav">
+			<a class="icon-remove" data-action="close">
+				<i class="cog-sml"></i>
+			</a>
+		</div>
+	</div>
+	<div class="tabMenu" align="center">
+		<a href="/#/search" ng-click="viewMessages()" title="view messages"><i class="icon-align-justify icon-large" title="Messages"></i></a>
+		<a href="/#/search" ng-click="viewLinks()" title="view links"><i class="icon-link icon-large" title="Links"></i></a>
+	</div>
+	<div class="searchlist" when-scrolled="loadMore()" ng-switch on="viewType" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
+		<div ng-switch-when="1" ng-style="style()">
+		 <ul >
+			<li ng-repeat="searchstream in allSearchStreams | filter:searchText">
+				<div class="srch-panel" >
+					<a class="urltitle" href="{{searchstream.url.url}}" target="_blank">{{searchstream.url.page_title}}</a>
+					<div class="sentiment">
+						<div class="sentimentbar">
+							<div class="negativebar" style="width: {{searchstream.url.sentiment*100}}%"></div>
+						</div>
+						<div class="stext">{{(searchstream.url.sentiment*100).toFixed(1)}}%</div>
+					</div>
+					<div class="url-linksm">
+						<a target="_bank" href="{{searchstream.url.url}}">{{searchstream.url.url}}</a>
+					</div>
+					<p>{{searchstream.url.summary}}</p>
+					<div class="xsmall context">
+						<span class="musername">First Posted at:</span>
+						<a rel="url" target="_bank">{{searchstream.url.created_at| date:'d MMM'}}</a>
+						<br>
+						<span class="musername">Most Recently Posted at:</span>
+						<a rel="url" target="_bank">{{searchstream.url.updated_at| date:'d MMM'}}</a>
+					</div>
+				</div>
+			</li>
+		</ul>
+		</div>
+		<div ng-switch-when="0" ng-style="style()">
+		 <ul >
+			<li ng-repeat="searchstream in allSearchStreams | filter:searchText">
+				<a class="urltitle" href="{{searchstream.url.url}}" target="_blank">{{searchstream.url.page_title}}</a>
+				<div class="sentiment">
+					<div class="sentimentbar">
+						<div class="negativebar" style="width: {{searchstream.url.sentiment*100}}%"></div>
+					</div>
+					<div class="stext">{{(searchstream.url.sentiment*100).toFixed(1)}}%</div>
+				</div>
+				<div class="url-linksm">
+					<a target="_bank" href="{{searchstream.url.url}}">{{searchstream.url.url}}</a>
+				</div>
+				<p>{{searchstream.url.summary}}</p>
+				<div class="xsmall context">
+					<span class="musername">First Posted at:</span>
+					<a rel="url" target="_bank">{{searchstream.url.created_at| date:'d MMM'}}</a>
+					<br>
+					<span class="musername">Most Recently Posted at:</span>
+					<a rel="url" target="_bank">{{searchstream.url.updated_at| date:'d MMM'}}</a>
+				</div>
+			</li>
+		</ul>
+		</div>
+	</div>
+<!--</ul> -->
+

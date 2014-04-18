@@ -1,0 +1,175 @@
+'use strict';
+
+angular.module('fswireClientApp').factory('streamModel', function ($rootScope, apiService, pusherService, localStorageService, sessionModel) {
+
+    var allStreams = localStorageService.get('all_streams');
+    if (allStreams === null) allStreams = [];
+
+    var currentStreams = localStorageService.get('current_streams');
+    if (currentStreams === null) currentStreams = [];
+
+    var privateMembers = {
+        includesLink: function(stream, link) {
+          var exits = false;
+          angular.forEach(stream.links, function(value, key){
+             if (value.url === link) {
+              exits = true;
+             };
+           });
+          return exits;
+        },
+
+        includesMessage: function(stream, id) {
+          var exits = false;
+          angular.forEach(stream.messages, function(value, key){
+             if (value.id === id) {
+              exits = true;
+             };
+           });
+          return exits;
+        },
+        includesStream:function(id) {
+          var streamExists = false;
+          angular.forEach(currentStreams, function(value, key){
+             if (value.chat.id === id) {
+              streamExists = true;
+             };
+           });
+          return streamExists;
+        },
+
+        addToCurrentStreams:function(stream) {
+          stream['messages'] = [];
+          stream['links'] = [];
+          if (!privateMembers.includesStream(stream.chat.id)) {
+            currentStreams.push(stream);
+            $rootScope.$broadcast('streamModel::userStreamAdded', stream);
+          }
+        },
+
+        removeFromCurrentStream:function(stream) {
+          var size = currentStreams.length;
+          for(var idx =0; idx< size; idx++) {
+            if (currentStreams[idx].chat.id == stream.chat.id)  {
+              currentStreams.splice(idx,1)
+              break;
+            }
+          }
+        },
+
+        saveCurrentStreamsList:function() {
+          localStorageService.set('current_streams', currentStreams);
+        },
+
+        saveAllStreamList:function() {
+          localStorageService.set('all_streams', allStreams);
+        },
+
+        clearAllStreamsList:function() {
+          localStorageService.set('all_streams', []);
+        },
+
+        clearCurrentStreamsList:function() {
+          localStorageService.set('current_streams', []);
+        }
+    };
+
+    return {
+      clearCache: function() {
+        privateMembers.clearCurrentStreamsList();
+        privateMembers.clearCurrentStreamsList();
+      },
+      all: function() {
+        if (allStreams.length === 0) {
+          var apiCall = apiService.Streams.all(sessionModel.authenticationToken());
+          apiCall.success(function(data) {
+            angular.forEach(data.response, function(stream) {
+              allStreams.push(stream);
+            });
+
+            privateMembers.saveAllStreamList();
+          });
+        };
+        return allStreams;
+      },
+      get: function(id) {
+        var size = allStreams.length;
+        for(var idx =0; idx< size; idx++) {
+          if (allStreams[idx].chat.id == id) return allStreams[idx];
+        }
+      },
+      find: function (searchString) {
+        return {};
+      },
+      getByChannel:function(channelName) {
+        var size = allStreams.length;
+        for(var idx =0; idx< size; idx++) {
+          if (allStreams[idx].chat.channel == channelName) return allStreams[idx];
+        }
+      },
+      current: function() {
+        var apiCall = apiService.Streams.current(sessionModel.get('user_id'), sessionModel.authenticationToken());
+
+        apiCall.success(function(data) {
+
+          angular.forEach(data, function(stream) {
+            privateMembers.addToCurrentStreams(stream);
+          });
+
+          privateMembers.saveCurrentStreamsList();
+
+        });
+
+        return currentStreams;
+      },
+      add: function(id) {
+        var apiCall = apiService.Streams.add(sessionModel.get('user_id'), id, sessionModel.authenticationToken());
+        apiCall.success(function(stream){
+          privateMembers.addToCurrentStreams(stream);
+          privateMembers.saveCurrentStreamsList();
+          $rootScope.$broadcast('streamModel::userStreamAdded', stream);
+        });
+      },
+      addByChannelName: function(channelName) {
+        this.add(this.getByChannel(channelName).chat.id);
+      },
+      remove: function(stream) {
+        apiService.Streams.remove(sessionModel.get('user_id'), stream.chat.id, sessionModel.authenticationToken());
+        privateMembers.removeFromCurrentStream(stream);
+        privateMembers.saveCurrentStreamsList();
+        $rootScope.$broadcast('streamModel::userStreamRemoved', stream);
+      },
+      registerForNewPushMessages: function(id, channel, callback) {
+        pusherService.registerForNewMessages(id, channel, callback);
+      },
+      unregisterForNewPushMessages: function(id, channel, callback) {
+        pusherService.unregisterForNewMessages(id, channel, callback);
+      },
+      messages: function(stream, lastMessageId) {
+        var self = this;
+        apiService.Streams.messages(stream.chat.id, lastMessageId, 0, sessionModel.get('auth_token')).success(function(data){
+          angular.forEach(data, function(dataItem){
+            self.addMessageToStream(stream, dataItem.message, true);
+          });
+        });
+      },
+      addMessageToStream: function(stream, message, appendMessage) {
+        if (!privateMembers.includesMessage(stream, message.id)) {
+          appendMessage ? stream.messages.push(message) : stream.messages.unshift(message);
+        }
+      },
+      links: function(stream, lastLinkId) {
+        var self = this;
+        apiService.Streams.links(stream.chat.id, lastLinkId, sessionModel.get('auth_token')).success(function(data) {
+          angular.forEach(data.response, function(dataItem) {
+            self.addLinkToStream(stream, dataItem);
+          });
+        });
+      },
+      addLinkToStream: function(stream, link, appendLink) {
+        if (!privateMembers.includesLink(stream, link.url)) {
+          appendLink ? stream.links.push(link) : stream.links.unshift(link);
+        }
+      }
+    };
+  });

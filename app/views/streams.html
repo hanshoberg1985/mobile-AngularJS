@@ -1,0 +1,98 @@
+<ul rn-carousel rn-carousel-buffered rn-carousel-watch rn-carousel-indicator rn-carousel-index="currentStreamIndex" class="repo ng-scope rn-carousel-slides rn-carousel-noanimate disable-select" style="-webkit-transform: translate(0px, 0);">
+  <li ng-repeat="stream in currentStreams" class="ng-scope ng-binding" ng-controller="StreamDetailCtrl">
+      <div ng-click="$spMenu.toggle()" class="page repo-name ng-binding streamheader">{{stream.chat.channel.toUpperCase()}}{{stream.links}}
+          <!---
+          <div class="pull-right">
+              <button class="btn btn-inverse">News Feeds</button>
+          </div>
+          --->
+		  
+          <div class="top_menu_items">
+					<ul>
+                        <li ng-click="viewMessages()" title="Custom Search"><i class="icon-search icon-large" title="Search"></i></li>
+                        <li ng-click="viewMessages()" title="View Settings"><i class="icon-cog icon-large" title="Settings"></i></li>
+                        
+                           <li ng-click="viewMessages()" title="view messages"><i class="icon-align-justify icon-large" title="Messages"></i></li>
+                           <li ng-click="viewLinks()" title="view links"><i class="icon-link icon-large" title="Links"></i></li>
+                           <li ng-click="removeStream()" title="remove stream"><i class="icon-remove-circle icon-large" title="Remove security"></i></li>
+                        
+                     </ul>
+           </div>
+	  </div>
+      <div id="fixed" when-scrolled="loadMore()" ng-switch on="viewType" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
+        <div ng-switch-when="1" ng-style="style()">
+          <ul class="pull-left unstyled contentlist" ng-style="style()">
+            <li  class="message" ng-repeat="link in stream.links| orderBy:'-last_posted_at'">
+              <div class="msg-panel" >
+                <div class="msg-header">
+                  <a href="{{link.url}}" target="_blank">{{link.page_title}}</a>
+                  <time data-activity-published="">
+                    {{link.last_posted_at | moment}}
+                  </time>
+                </div>
+                <div class="msg-content">
+                  <p ng-bind-html-unsafe="'...' + link.summary + '...' | cleanText | linkDecorator"></p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div ng-switch-when="0" ng-style="style()">
+          <ul class="pull-left unstyled contentlist">
+            <li class="message" ng-repeat="message in stream.messages| orderBy:'-id'" ng-click="message.url_count > 0 && expand(message.id)" ng-class="{'active':message.id === selectedMessageId}">
+              <div class="msg-panel {{message.updated_at | moment}}" >
+
+  							<div class="imageholder">
+  								<img src="" width="50" height="50"/>
+  							</div>
+
+                <div class="msg-header">
+                  <strong class="fullname">{{message.user.first_name}} {{message.user.last_name}}</strong>
+                  <span class="username">(@{{message.user.twitter}})</span>
+                  <time data-activity-published="">
+                    {{message.updated_at | moment}}
+                  </time>
+                </div>
+                <p ng-bind-html-unsafe="message.message | linkDecorator"></p>
+
+                  <div class="msg-posted" ng-if="message.id !== selectedMessageId">
+                      Posted in: {{message.chat.channel}}
+                  </div>
+
+  				  <div class="msg-content" ng-if="message.id == selectedMessageId">
+
+                       <div ng-controller="MessageDetailCtrl">
+                        <br>
+                        <ul class="unstyled posturls" ng-show="message.urls.length>0">
+                            <li ng-repeat="post in message.urls">
+                                <div ng-if="post.url.page_title.length>0">
+                                    <p>
+                                  {{post.url.page_title}}
+                                  <br>
+                                   <a href="{{post.url.url}}" target="_blank">{{post.url.url}}</a>
+                              </p>
+                                    <p>{{post.url.summary}}</p>
+                                </div>
+                            </li>
+                        </ul>
+
+
+                      <div class="streamsection" ng-show="message.streams.stream.length>0" style="display:block !important;">
+                          <div class="pull-left streams">
+                              <label></label>
+                              Posted In:<div class="channel" ng-repeat="stream in message.streams">{{stream.stream.channel}}</div>
+                          </div>
+                          </div>
+                     </div>
+
+                      <div ng-controller="LoadingCtrl" class="full-width">
+                        <span ng-show="loading"><i class="icon-spinner icon-spin"></i> Loading details. Please wait ...</span>
+                      </div>
+				  </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+  </li>
+</ul>

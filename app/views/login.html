@@ -1,0 +1,31 @@
+<div class="container-fluid" id="loginModal"  ng-init="loginpage()">
+  <div class="loginContainer">
+    <div class="fscreen">
+      <form ng-submit="login()">
+        <fieldset>
+          <div id="homelogo" class="row-fluid" style="margin-bottom:30px !important;">
+              <img src="/images/FS-wire-Logo-h34.png" class="homelogo span12"/>
+          </div>
+			<div class="error-message" style="margin-bottom:30px;"><span style="color:white;display:none;text-align:center;" name="error" class="error" id="error">Invalid Email and Password</span></div>
+          <div class="row-fluid formrow">
+		 
+            <!-- Username -->
+            <label class="span4 loginlabel"  for="email">Email:</label>
+            <input type="text" class="logininput span8" name="email" placeholder="email" ng-model="credentials.email" required class="input-xlarge">
+          </div>
+
+          <div class="row-fluid formrow">
+            <!-- Password-->
+            <label class="span4 loginlabel" for="password">Password:</label>
+            <input type="password" class="span8 logininput" name="password" placeholder="password" ng-model="credentials.password" required class="input-xlarge">
+          </div>
+
+          <div class="row-fluid formrow">
+            <!-- Button -->
+              <button class="btn btn-success loginbtn">Login</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>

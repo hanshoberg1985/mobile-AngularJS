@@ -1,0 +1,167 @@
+<!doctype html >
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- <link rel="apple-touch-startup-image" href="./images/startscreen-320x460.png">
+    <link rel="apple-touch-icon" href="./images/touch-icon-iphone.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="./images/touch-icon-ipad.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="./images/touch-icon-iphone4.png" />
+  -->
+    <!-- build:css styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="styles/angular-carousel.min.css" rel="stylesheet" type="text/css" />
+    <link href="styles/ng-mobile-menu.min.css" rel="stylesheet" type="text/css" />
+    <!-- endbuild -->
+  </head>
+  <body ng-app="fswireClientApp" class="ng-scope">
+    <!--[if lt IE 7]>
+      <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+      <script src="components/es5-shim/es5-shim.js"></script>
+      <script src="components/json3/lib/json3.min.js"></script>
+    <![endif]-->
+
+    <!-- Add your site or application content here
+		typeahead="stream.chat.channel for stream in allStreams | filter:$viewValue" -->
+
+    <div ng-controller="ApplicationCtrl">
+        <div class="addStreamModal" ng-show="showAddModal" id="addStreamModal" style="display:none;">
+            <i class="icon-remove" ng-click="closemodal()"></i>
+            <div>
+                <h3>Add Security</h3>
+                <input type="text" ng-model="selected">
+                <div class="streamlist">
+                    <ul ng-if="selected.length>2">
+                        <li ng-repeat="stream in allStreams | filter:selected" ng-click="selectstream(stream.chat.channel)">
+                            {{stream.chat.channel}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    	<div ng-if="isMobile">
+            <div class="nav-bar-top" ng-show="view.show"  style="display:none;" id="nav-top">
+                <ul class="list ng-scope">
+                    <li class="logocontainer"><div class="logo"><img src="images/fswire-portrait.png"></div></li>
+                    <li ng-if="hiddenMenusCounts>0">
+                    	<i class="expandMenu" ng-click="showHiddenMenu()"></i>
+                    	<div class="hiddenmenu" ng-if="hiddenMenusCounts>0" ng-show="showMenus">
+                    		<ul>
+                    			<li ng-repeat="item in navigationItems|filter:hiddenPhoneMenu" ng-selected="item.selected" ng-click="callfunc(item.navId,item.action)">
+                                    {{item.text}}
+                                </li>
+                    		</ul>
+                    	</div>
+                    </li>
+                  <li class="{{selectedStyle(item.navId)}}" ng-repeat="item in navigationItems|filter:fixedPhoneMenu|orderBy:'-phoneshow'" ng-selected="item.selected" ng-click="callfunc(item.navId,item.action)">
+                    <i class="{{item.classname}}"></i>
+                  </li>
+                </ul>
+            </div>
+            <div id="sp-page">
+                <div ng-controller="LoadingCtrl" class="full-width spinnercon">
+                    <div class='spinner' ng-show="loading"></div>
+                </div>
+
+                <div class="fill" ng-view></div>
+            </div>
+		</div>
+			<div ng-if="!isMobile">
+            <div id="sp-nav" ng-show="view.show" class="nav-bar-left show" style="top:-30px;" >
+                <ul  class="list ng-scope ">
+                  <li><div class="logo"></div></li>
+                  <li class="{{selectedStyle(item.navId)}}" ng-repeat="item in navigationItems" ng-selected="item.selected" ng-click="callfunc(item.navId,item.action)">
+                    <i class="{{item.classname}}"></i>
+                  </li>
+                </ul>
+            </div>
+            <div id="sp-page">
+                <div ng-controller="LoadingCtrl" class="full-width spinnercon">
+                    <div class='spinner' ng-show="loading"></div>
+                </div>
+                <div class="fill" ng-view></div>
+            </div>
+        </div>
+    </div>
+
+	
+    <script src="components/underscore/underscore.js"></script>
+    <script src="components/angular-1.1.5/angular.js"></script>
+    <script src="components/angular-1.1.5/angular-resource.js"></script>
+    <script src="components/angular-1.1.5/angular-cookies.js"></script>
+    <script src="components/angular-1.1.5/angular-sanitize.js"></script>
+    <script src="components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="components/angular-carousel/angular-mobile.js"></script>
+    <script src="components/angular-carousel/angular-carousel.js"></script>
+    <script src="components/ng-mobile-menu.min.js"></script>
+    <script src="components/loading.js"></script>
+    <script src="components/localStorageModule.js"></script>
+    <script src="http://js.pusher.com/1.12/pusher.min.js"></script>
+    <script src="components/moment.min.js"></script>
+
+    <!-- build:js scripts/scripts.js -->
+	
+	
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="scripts/app.js"></script>
+    <script src="scripts/services/authentication_service.js"></script>
+    <script src="scripts/services/api_service.js"></script>
+    <script src="scripts/services/flash_service.js"></script>
+    <script src="scripts/services/pusher_service.js"></script>
+    <script src="scripts/services/config_service.js"></script>
+
+    <script src="scripts/models/session_model.js"></script>
+    <script src="scripts/models/stream_model.js"></script>
+    <script src="scripts/models/message_model.js"></script>
+	<script src="scripts/models/search_model.js"></script>
+
+    <script src="scripts/directives/when_scrolled.js"></script>
+
+    <script src="scripts/filters/moment.js"></script>
+    <script src="scripts/filters/link_decorator.js"></script>
+    <script src="scripts/filters/clean_text.js"></script>
+
+    <script src="scripts/controllers/application.js"></script>
+    <script src="scripts/controllers/logon.js"></script>
+    <script src="scripts/controllers/stream_list.js"></script>
+	<script src="scripts/controllers/stream_detail.js"></script>
+	<!--<script src="scripts/controllers/search.js"></script>
+    
+    <script src="scripts/controllers/settings.js"></script>
+    <script src="scripts/controllers/message_detail.js"></script>
+	<script src="scripts/controllers/message.js"></script>
+    <script src="scripts/controllers/link.js"></script> -->
+    <script>
+ 	function fadeout(){     
+ 	$(".msg-panel.in").css("background-color",'#FFFFFF');
+ 	}
+ 	 $(document).ready(function() {
+       setInterval(fadeout,100);   
+  	});
+   </script> 
+
+    <!-- endbuild -->
+
+    <!-- Google Analytics: change UA-25968189-5 to be your site's ID. -->
+    <!--
+    <script>
+      var _gaq=[['_setAccount','UA-25968189-5'],['_trackPageview']];
+      (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+      g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g,s)}(document,'script'));
+	   s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
+    -->
+  </body>
+</html>
